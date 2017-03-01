@@ -1,3 +1,5 @@
 language: csharp
 solution: AnagramCheck.sln
 mono: none
+script:
+  - xbuild /p:Configuration=Debug AnagramCheck.sln
