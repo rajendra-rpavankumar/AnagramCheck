@@ -1,41 +1,24 @@
-version: 1.0.0.{build}
-
-configuration: ReleaseNoVsix
-
-init:
-  - git config --global core.autocrlf true
-
-clone_folder: c:\projects\code-cracker
-
-shallow_clone: false
-
-clone_depth: 5
-
+version: 1.0.{build}
+skip_tags: true
+configuration: Release
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
 environment:
   COVERALLS_REPO_TOKEN:
     secure: 6x28xtKiwJ7f1WhYUrc6LQ1WG5QSn0pJQOHIolJ+zWDE7mqRAS5K1X/mbbi7w9C2
-
 before_build:
-  - ps: >-
-      $env:path="C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files (x86)\Microsoft SDKs\F#\3.1\Framework\v4.0\;C:\Program Files (x86)\Microsoft SDKs\TypeScript\1.0;C:\Program Files (x86)\MSBuild\12.0\bin;C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\BIN;C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools;C:\Windows\Microsoft.NET\Framework\v4.0.30319;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\VCPackages;C:\Program Files (x86)\HTML Help Workshop;C:\Program Files (x86)\Microsoft Visual Studio 12.0\Team Tools\Performance Tools;C:\Program Files (x86)\Windows Kits\8.1\bin\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\Microsoft SQL Server\110\Tools\Binn\;C:\Program Files (x86)\Microsoft SDKs\TypeScript\1.0\;$env:path"
-      . .\build.ps1 Prepare-Build
-build_script:
-  - ps: . .\build.ps1 Build-Only
-
-
-after_build:
-  - ps: >-
-      . .\build.ps1 Pack-Nuget
+  - nuget restore ".\src\AnagramCheck.sln"
+build:
+  project: .\src\AnagramCheck.sln
+  verbosity: minimal
 test_script:
-  - ps: >-
-      . .\build.ps1 Test
-after_test:
-  - ps: >-
-      . ".\test\CSharp\AnalyzeCecil.ps1"
-artifacts:
-  - path: src
-    name: src
-  - path: test
-    name: test
-  - path: log
-    name: log
+- ps: >-
+    .\src\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:xunit.console.clr4.exe "-targetargs:""AnagramCheck\AnagramCheckUnitTests\bin\$env:CONFIGURATION\AnagramCheckUnitTests.dll"" /noshadow /appveyor" -filter:"+[AnagramCheck*]*" -output:opencoverCoverage.xml
+
+    $coveralls = (Resolve-Path "src/packages/coveralls.net.*/tools/csmacnz.coveralls.exe").ToString()
+
+    & $coveralls --opencover -i opencoverCoverage.xml --repoToken $env:COVERALLS_REPO_TOKEN --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_JOB_ID
