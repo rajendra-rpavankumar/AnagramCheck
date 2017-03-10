@@ -6,3 +6,4 @@ The result of rearranging the letters of a given word or phrase to produce a new
 For example, the word anagram can be rearranged into nag-a-ram.
 
 C.I:[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/rajendra-rpavankumar/anagramcheck??branch=master&svg=true)](https://ci.appveyor.com/project/rajendra-rpavankumar/anagramcheck/branch/master)
+[![Coverage Status](https://coveralls.io/repos/github/rajendra-rpavankumar/AnagramCheck/badge.svg?branch=master)](https://coveralls.io/github/rajendra-rpavankumar/AnagramCheck?branch=master)
