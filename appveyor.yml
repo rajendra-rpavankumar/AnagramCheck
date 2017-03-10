@@ -11,9 +11,9 @@ environment:
   COVERALLS_REPO_TOKEN:
     secure: 6x28xtKiwJ7f1WhYUrc6LQ1WG5QSn0pJQOHIolJ+zWDE7mqRAS5K1X/mbbi7w9C2
 before_build:
-  - nuget restore ".\AnagramCheck\AnagramCheck.sln"
+  - nuget restore ".\AnagramCheck.sln"
 build:
-  project: .\AnagramCheck\AnagramCheck.sln
+  project: .\AnagramCheck.sln
   verbosity: minimal
 test_script:
 - ps: >-
