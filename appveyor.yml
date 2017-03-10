@@ -17,7 +17,7 @@ build:
   verbosity: minimal
 test_script:
 - ps: >-
-    ..\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe -register:user -target:xunit.console.clr4.exe "-targetargs:""AnagramCheck\AnagramCheckUnitTests\bin\$env:CONFIGURATION\AnagramCheckUnitTests.dll"" /noshadow /appveyor" -filter:"+[AnagramCheck*]*" -output:opencoverCoverage.xml
+    "D:\GitHubNew\AnagramCheck\packages\OpenCover.4.6.519\tools\OpenCover.Console.exe" -register:user -target:xunit.console.clr4.exe "-targetargs:""AnagramCheck\AnagramCheckUnitTests\bin\$env:CONFIGURATION\AnagramCheckUnitTests.dll"" /noshadow /appveyor" -filter:"+[AnagramCheck*]*" -output:opencoverCoverage.xml
 
     $coveralls = (Resolve-Path "AnagramCheck/packages/coveralls.net.*/tools/csmacnz.coveralls.exe").ToString()
 
