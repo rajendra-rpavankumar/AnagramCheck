@@ -1,19 +1,41 @@
-version: 1.0.{build}
-os: Visual Studio 2013
+version: 1.0.0.{build}
+
+configuration: ReleaseNoVsix
+
 init:
-- git config --global core.autocrlf true
-install:
-- set PATH=C:\Program Files (x86)\MSBuild\12.0\Bin;%PATH%
+  - git config --global core.autocrlf true
+
+clone_folder: c:\projects\code-cracker
+
+shallow_clone: false
+
+clone_depth: 5
+
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: 9qsI9p9EPYyYoEetOcoQ76A7zfQRdstXY81MQFnX1Zpddtc0CrQThKAFPUba12m4
+
 before_build:
-- nuget restore
-build:
-  project: AnagramCheck.sln
-  verbosity: minimal
+  - ps: >-
+      $env:path="C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files (x86)\Microsoft SDKs\F#\4.0\Framework\v4.0\;C:\Program Files (x86)\Microsoft SDKs\TypeScript\1.1;C:\Program Files (x86)\MSBuild\14.0\bin;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\BIN;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools;C:\Windows\Microsoft.NET\Framework\v4.0.30319;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\VCPackages;C:\Program Files (x86)\HTML Help Workshop;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Performance Tools;C:\Program Files (x86)\Windows Kits\8.1\bin\x86;C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files (x86)\Microsoft SDKs\TypeScript\1.1\;$env:path"
+      . .\build.ps1 Prepare-Build
+build_script:
+  - ps: . .\build.ps1 Build-Only
+
+
+after_build:
+  - ps: >-
+      . .\build.ps1 Pack-Nuget
 test_script:
-- .\packages\OpenCover.4.6.247-rc\tools\OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:"D:\GitHubNew\AnagramCheck\AnagramCheckUnitTests\bin\Debug\AnagramCheckUnitTests.dll -noshadow -appveyor" -returntargetcode -filter:"+[StyleCop*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -excludebyfile:*\*Designer.cs -hideskipped:All -output:.\AnagramCheck_coverage.xml
-- "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
-- pip install codecov
-- codecov -f "AnagramCheck_coverage.xml"
-# preserve "packages" directory in the root of build folder but will reset it if packages.config is modified
-cache:
-  - packages -> **\packages.config
+  - ps: >-
+      . .\build.ps1 Test
+after_test:
+  - ps: >-
+      . ".\test\CSharp\AnalyzeCecil.ps1"
+artifacts:
+  - path: src
+    name: src
+  - path: test
+    name: test
+  - path: log
+    name: log
