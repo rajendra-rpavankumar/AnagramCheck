@@ -4,5 +4,16 @@ configuration: Release
 build:
   parallel: true                  # enable MSBuild parallel builds
   project: AnagramCheck.sln      # path to Visual Studio solution or project
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: 6x28xtKiwJ7f1WhYUrc6LQ1WG5QSn0pJQOHIolJ+zWDE7mqRAS5K1X/mbbi7w9C2
+after_test: 
+# generate report for NUnit testing framework:
+    #-cmd: packages\OpenCover.4.6.166\tools\OpenCover.Console.exe -register:user -filter:"+[*]*" -target:"packages\NUnit.Runners.2.6.4\tools\nunit-console.exe" -targetargs:"/noshadow /domain:single YOURPROJECT.Tests\bin\debug\YOURPROJECT.Tests.dll" -output:coverage.xml
+
+# generate report for MSTest testing framework:
+#    -cmd: packages\OpenCover.4.6.166\tools\OpenCover.Console.exe -register:user -filter:"+[*]*" -target:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\MSTest.exe" -targetargs:"/testcontainer:YOURPROJECT.Tests/bin/debug/YOURPROJECT.Tests.dll" -output:coverage.xml
+
+    - cmd: packages\coveralls.io.1.3.4\tools\coveralls.net.exe --opencover coverage.xml
 # MSBuild verbosity level
   verbosity: minimal
